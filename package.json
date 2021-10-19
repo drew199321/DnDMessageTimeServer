@@ -1,0 +1,13 @@
+{
+  "name": "dnd-message-server",
+  "version": "0.0.1",
+  "description": "server",
+  "main": "index.js",
+  "repository": "https://github.com/r-d-jorgensen/DnDMesageTimeServer.git",
+  "author": "David <r.d.jorgensen@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "dotenv": "^10.0.0",
+    "express": "^4.17.1"
+  }
+}
