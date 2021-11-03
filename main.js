@@ -14,11 +14,20 @@ function authetication(data) {
 }
 
 app.get('/login', (req, res) => {
-  // TODO: Check that user data was sent
-  // TODO: Check user against known users and Auth user
-  console.log(`user, ${req.query.username} logged in`); // TODO: log the failure as well
 
-  res.json(authetication(req.query)).status(200);
+  // DONE: Check that user data was sent
+  if(req){
+    console.log(`user, ${req.query.username} logged in`);
+    res.json(authetication(req.query)).status(200);
+  
+  }
+
+  // TODO: Check user against known users and Auth user
+  else{
+    console.log(`Error: Credentials not recieved from client`);
+    res.json(authentication(req.query)).status(300);
+  
+  }
 });
 
 app.post('/register', (req, res) => {
