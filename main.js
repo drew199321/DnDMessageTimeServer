@@ -33,8 +33,8 @@ app.get('/login', (req, res) => {
   // Check that user data was sent
   console.log(req.query);
   if (req) { // TODO: Check that there is a username and password in query object and query object exits
+    // TODO: Check file system for check group has user
     // TODO: Check file system for user with those username and password combo
-    // TODO: check user is member of group as well
     console.log(`user, ${req.query.username} logged in`);
     res.json(authentication(req.query)).status(200);
   } else {
@@ -49,6 +49,7 @@ app.post('/register', (req, res) => {
   // TODO: If username exists respond with bad authentication
   // TODO: Register user in system
   // TODO: Register user with the group or create group if user is admin... there can only be one admin
+  // TODO: Username is tied to group not reverse
   console.log(`user, ${req.body.username} registered`);
   res.json(authentication(req.body)).status(200);
 });

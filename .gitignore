@@ -9,8 +9,9 @@
 # production
 /build
 
-# secrets
-/cert/Data-Movers-Key-Pair.pem
+# txt files
+groups.txt
+/chatlogs/*.chatlog.txt
 
 # misc
 .DS_Store
