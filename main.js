@@ -31,8 +31,12 @@ function readFromFile() {
 function authentication(data) {
   // TODO: replace stub with actual auth system
   console.log(`creating authentication using user data form ${data.username}`);
-  const authToken = { isAuthenticated: true, token: 'tokenData', userType: 'member' }; // TODO: If admin send that back
-  return authToken;
+  return {
+    isAuthenticated: true,
+    token: 'tokenData',
+    userType: 'member',
+    username: data.username,
+  }; // TODO: If admin send that back
 }
 
 app.get('/login', (req, res) => {
