@@ -2,6 +2,7 @@ require('dotenv').config({ path: '.env' });
 const express = require('express');
 const http = require('http');
 const cors = require('cors');
+const fs = require('fs');
 
 const app = express();
 const server = http.createServer(app);
@@ -14,6 +15,19 @@ function authentication(data) {
   const authToken = { isAuthenticated: true, token: 'tokenData' };
   return authToken;
 }
+
+// (B) WRITE TO FILE
+fs.writeFile('demo.txt', 'CONTENT', 'utf8', (error, data) => {
+  console.log('Write complete');
+  console.log(error);
+  console.log(data);
+});
+
+fs.readFile('demo.txt', 'utf8', (error, data) => {
+  console.log('Read complete');
+  console.log(error);
+  console.log(data);
+});
 
 app.get('/login', (req, res) => {
   // Check that user data was sent
