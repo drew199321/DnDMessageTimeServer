@@ -1,8 +1,10 @@
 require('dotenv').config({ path: '.env' });
 const express = require('express');
+const socketio = require('socket.io');
 const http = require('http');
 const cors = require('cors');
 // const fs = require('fs');
+const chat = require('./chat');
 
 const app = express();
 const server = http.createServer(app);
@@ -29,14 +31,15 @@ function readFromFile() {
 function authentication(data) {
   // TODO: replace stub with actual auth system
   console.log(`creating authentication using user data form ${data.username}`);
-  const authToken = { isAuthenticated: true, token: 'tokenData' };
+  const authToken = { isAuthenticated: true, token: 'tokenData', userType: 'member' }; // TODO: If admin send that back
   return authToken;
 }
 
 app.get('/login', (req, res) => {
   // Check that user data was sent
   console.log(req.query);
-  if (req) { // TODO: Check that there is a username and password in query object and query object exits
+  if (req) {
+    // TODO: Check that there is a username and password in query object and query object exits
     // TODO: Check file system for check group has user
     // TODO: Check file system for user with those username and password combo
     console.log(`user, ${req.query.username} logged in`);
@@ -57,6 +60,14 @@ app.post('/register', (req, res) => {
   console.log(`user, ${req.body.username} registered`);
   res.json(authentication(req.body)).status(200);
 });
+
+const io = socketio(server, {
+  cors: {
+    origin: '*',
+    methods: ['GET', 'POST'],
+  },
+});
+chat(io);
 
 server.listen(process.env.WEB_PORT, () => {
   console.log(`Server is listning on port ${process.env.WEB_PORT}.`);
