@@ -41,15 +41,17 @@ class Connection {
   }
 }
 
+/*
 function setUser(socket, next) {
   users.set(socket, {
     user: 'person', // TODO: should be given when user connects
   });
   next();
 }
+*/
 
 function chat(io) {
-  io.use(setUser);
+  // io.use(setUser);
   io.on('connection', (socket) => {
     // eslint-disable-next-line no-new
     new Connection(io, socket);
