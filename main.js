@@ -1,6 +1,7 @@
 require('dotenv').config({ path: '.env' });
 const express = require('express');
 const socketio = require('socket.io');
+const mysql = require('mysql');
 const os = require('os');
 const http = require('http');
 const cors = require('cors');
@@ -11,6 +12,23 @@ const app = express();
 const server = http.createServer(app);
 app.use(express.json({ limit: '50mb' }));
 app.use(cors());
+
+const dbConnection = mysql.createConnection({
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  port: process.env.DB_PORT,
+  database: process.env.DB_DATABASE,
+});
+
+// TODO: May need to open and close the connection for each call
+dbConnection.connect((err) => {
+  if (err) {
+    console.error(`Database connection failed:\n${err.stack}`);
+    return;
+  }
+  console.log('Connected to database.');
+});
 
 function writeToFile(data) {
   fs.appendFile('demo.txt', data + os.EOL, 'utf8', (error) => {
