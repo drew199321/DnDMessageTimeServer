@@ -9,26 +9,31 @@ const savedMessages = [
     username: 'steve',
     messageType: 'brodcast',
     message: 'words words words',
+    time: 'time',
   },
   {
     username: 'bob',
     messageType: 'direct',
     message: 'words words words',
+    time: 'time',
   },
   {
     username: 'kevin',
     messageType: 'direct',
     message: 'words words words',
+    time: 'time',
   },
   {
     username: 'bob',
     messageType: 'direct',
     message: 'words words words',
+    time: 'time',
   },
   {
     username: 'steve',
     messageType: 'brodcast',
     message: 'words words words',
+    time: 'time',
   },
 ];
 */

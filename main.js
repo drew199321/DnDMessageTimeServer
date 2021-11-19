@@ -79,20 +79,13 @@ app.get('/login', (req, res) => {
 
 app.post('/register', (req, res) => {
   console.log(req.body);
-  // Order of Operations: "GroupName|UserType|UserName|password"
+  // Order of Operations: "UserType|UserName|password"
   // TODO: Check that user data was sent
   // Create user String for file
   // TODO: If username exists respond with bad authentication
   // TODO: Register user with the group or create group if user is admin... there can only be one admin
-  let adminCheckString = req.body.groupName;
-  adminCheckString += '|';
-  adminCheckString += req.body.userType;
-  let textLine = adminCheckString;
-  textLine += '|';
-  textLine += req.body.username;
-  textLine += '|';
-  textLine += req.body.password;
-  writeToFile(textLine);
+  const str = `${req.body.userType}|${req.body.username}|${req.body.password}`;
+  writeToFile(str);
   console.log(`user, ${req.body.username} registered`);
   res.json(authentication(req.body)).status(200);
 });
