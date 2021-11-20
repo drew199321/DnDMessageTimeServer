@@ -24,7 +24,7 @@ const dbConnection = mysql.createConnection({
 // TODO: May need to open and close the connection for each call
 dbConnection.connect((err) => {
   if (err) {
-    console.error(`Database connection failed:\n${err.stack}`);
+    console.error(`Database connection failed:\n ${err.stack}`);
     return;
   }
   console.log('Connected to database.');
@@ -102,7 +102,31 @@ app.post('/register', (req, res) => {
   // Create user String for file
   // TODO: If username exists respond with bad authentication
   // TODO: Register user with the group or create group if user is admin... there can only be one admin
-  const str = `${req.body.userType}|${req.body.username}|${req.body.password}`;
+  const str = `values (
+    ${req.body.username},
+    ${req.body.password},
+    ${req.body.userType}
+  )`;
+  const usersave = `
+  insert into users( username, passwrd, usertype)
+  values (
+    '${req.body.username}',
+    '${req.body.password}',
+    '${req.body.userType}'
+  )`;
+  const userget = 'select username, passwrd, userType, userid from users';
+  dbConnection.query(usersave, (err) => {
+    if (err) {
+      console.error(`Failed to write to DB: ${err.stack}\n`);
+    }
+    console.log('User info recorded to database');
+  });
+  dbConnection.query(userget, (err, result) => {
+    if (err) {
+      console.error(`Failed to get from database: ${err.stack}\n`);
+    }
+    console.log(result);
+  });
   writeToFile(str);
   console.log(`user, ${req.body.username} registered`);
   res.json(authentication(req.body)).status(200);
