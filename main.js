@@ -2,10 +2,10 @@ require('dotenv').config({ path: '.env' });
 const express = require('express');
 const socketio = require('socket.io');
 const mysql = require('mysql');
-const os = require('os');
+// const os = require('os');
 const http = require('http');
 const cors = require('cors');
-const fs = require('fs');
+// const fs = require('fs');
 const chat = require('./chat');
 
 const app = express();
@@ -29,7 +29,7 @@ dbConnection.connect((err) => {
   }
   console.log('Connected to database.');
 });
-
+/*
 function writeToFile(data) {
   fs.appendFile('demo.txt', data + os.EOL, 'utf8', (error) => {
     console.log('Write complete');
@@ -38,7 +38,7 @@ function writeToFile(data) {
   });
 }
 
-/* function readFromFile() {
+ function readFromFile() {
   fs.readFile('demo.txt', 'utf8', (error, data) => {
     console.log('Read complete');
     console.log(error);
@@ -102,11 +102,7 @@ app.post('/register', (req, res) => {
   // Create user String for file
   // TODO: If username exists respond with bad authentication
   // TODO: Register user with the group or create group if user is admin... there can only be one admin
-  const str = `values (
-    ${req.body.username},
-    ${req.body.password},
-    ${req.body.userType}
-  )`;
+  // let userchecksflag = 0;
   const usersave = `
   insert into users( username, passwrd, usertype)
   values (
@@ -114,22 +110,42 @@ app.post('/register', (req, res) => {
     '${req.body.password}',
     '${req.body.userType}'
   )`;
-  const userget = 'select username, passwrd, userType, userid from users';
+  const usercheck = 'select username from users';
+  const admincheck = 'select usertype from users';
+  dbConnection.query(usercheck, (err, result) => {
+    if (err) {
+      console.error(`Failed to check usernames: ${err.stack}\n`);
+    }
+    const strresult = JSON.stringify(result);
+    const strcomp = `"username":"${req.body.username}"`;
+    if (strresult.includes(strcomp)) {
+      console.log(`Error: Username ${req.body.username} already exists in database`);
+      // userchecksflag = 1;
+    }
+  });
+
+  if (req.body.userType === 'admin') {
+    dbConnection.query(admincheck, (err, result) => {
+      if (err) {
+        console.error(`Failed to check admin: ${err.stack}\n`);
+      }
+      const strresult = JSON.stringify(result);
+
+      if (strresult.includes('"usertype":0')) {
+        console.log('Error: Admin already exists');
+        // userchecksflag = 1;
+      }
+    });
+  }
+
   dbConnection.query(usersave, (err) => {
     if (err) {
       console.error(`Failed to write to DB: ${err.stack}\n`);
     }
     console.log('User info recorded to database');
+    console.log(`user, ${req.body.username} registered`);
+    res.json(authentication(req.body)).status(200);
   });
-  dbConnection.query(userget, (err, result) => {
-    if (err) {
-      console.error(`Failed to get from database: ${err.stack}\n`);
-    }
-    console.log(result);
-  });
-  writeToFile(str);
-  console.log(`user, ${req.body.username} registered`);
-  res.json(authentication(req.body)).status(200);
 });
 
 const io = socketio(server, {
