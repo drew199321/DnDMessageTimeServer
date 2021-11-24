@@ -6,30 +6,35 @@ const users = new Map();
 /*
 const savedMessages = [
   {
+    messageId: '1',
     username: 'steve',
     messageType: 'brodcast',
     message: 'words words words',
     time: 'time',
   },
   {
+    messageId: '2',
     username: 'bob',
     messageType: 'direct',
     message: 'words words words',
     time: 'time',
   },
   {
+    messageId: '3',
     username: 'kevin',
     messageType: 'direct',
     message: 'words words words',
     time: 'time',
   },
   {
+    messageId: '4',
     username: 'bob',
     messageType: 'direct',
     message: 'words words words',
     time: 'time',
   },
   {
+    messageId: '5',
     username: 'steve',
     messageType: 'brodcast',
     message: 'words words words',
