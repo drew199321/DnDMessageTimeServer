@@ -43,7 +43,7 @@ function authentication(data) {
   return {
     isAuthenticated: true,
     token: 'tokenData',
-    userType: 'member',
+    userType: data.userType,
     username: data.username,
   }; // TODO: If admin send that back
 }
@@ -51,7 +51,7 @@ function authentication(data) {
 app.get('/login', (req, res) => {
   // Check that user data was sent
   console.log(req.query);
-  if (req) {
+  if (req.body.username && req.body.password) {
     // TODO: Check that there is a username and password in query object and query object exits
     // TODO: Check file system for check group has user
     // TODO: Check file system for user with those username and password combo
@@ -63,54 +63,52 @@ app.get('/login', (req, res) => {
   }
 });
 
-app.post('/register', (req, res) => {
-  console.log(req.body);
-  // Order of Operations: "UserType|UserName|password"
-  // TODO: Check that user data was sent
-  // Create user String for file
-  // TODO: If username exists respond with bad authentication
-  // TODO: Register user with the group or create group if user is admin... there can only be one admin
-  // let userchecksflag = 0;
-  dbConnection.query('select username from users', (err, result) => {
-    if (err) {
-      console.error(`Failed to check usernames: ${err.stack}\n`);
-    }
-    const strresult = JSON.stringify(result);
-    const strcomp = `"username":"${req.body.username}"`;
-    if (strresult.includes(strcomp)) {
-      console.log(`Error: Username ${req.body.username} already exists in database`);
-      // userchecksflag = 1;
-    }
-  });
-
-  if (req.body.userType === 'admin') {
-    dbConnection.query('select usertype from users', (err, result) => {
-      if (err) {
-        console.error(`Failed to check admin: ${err.stack}\n`);
-      }
-      const strresult = JSON.stringify(result);
-
-      if (strresult.includes('"usertype":0')) {
-        console.log('Error: Admin already exists');
-        // userchecksflag = 1;
-      }
-    });
-  }
-
-  const usersave = `
-    insert into users( username, passwrd, usertype)
-    values (
-      '${req.body.username}',
-      '${req.body.password}',
-      '${req.body.userType}')`;
-  dbConnection.query(usersave, (err) => {
+function userEntry(data) {
+  dbConnection.query(`
+  insert into users( username, passwrd, usertype)
+  values (
+    '${data.username}',
+    '${data.password}',
+    '${data.userType}')`, (err) => {
     if (err) {
       console.error(`Failed to write to DB: ${err.stack}\n`);
     }
     console.log('User info recorded to database');
-    console.log(`user, ${req.body.username} registered`);
-    res.json(authentication(req.body)).status(200);
+    console.log(`user, ${data.username} registered`);
+    return authentication(data);
   });
+}
+
+app.post('/register', (req, res) => {
+  // TODO: Hack change nested queries to promises
+  if (req.body.username && req.body.password && req.body.userType) {
+    dbConnection.query('select username from users', (err, result) => {
+      if (err) {
+        console.error(`Failed to check usernames: ${err.stack}\n`);
+      }
+      if (JSON.stringify(result).includes(`"username":"${req.body.username}"`)) {
+        console.log(`Error: Username ${req.body.username} already exists in database`);
+        res.json({}).status(300);
+      } else if (req.body.userType === 'admin') {
+        dbConnection.query('select usertype from users', (err2, result2) => {
+          if (err2) {
+            console.error(`Failed to check admin: ${err.stack}\n`);
+          }
+          if (JSON.stringify(result2).includes('"usertype":0')) {
+            console.log('Error: Admin already exists');
+            res.json({}).status(300);
+          } else {
+            res.json(userEntry(req.body)).status(200);
+          }
+        });
+      } else {
+        res.json(userEntry(req.body)).status(200);
+      }
+    });
+  } else {
+    console.log('Error: Credentials not recieved from client');
+    res.json(authentication(req.query)).status(300);
+  }
 });
 
 const io = socketio(server, {
