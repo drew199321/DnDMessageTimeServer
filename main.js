@@ -100,7 +100,6 @@ function userEntry(data) {
     }
     console.log('User info recorded to database');
     console.log(`user, ${data.username} registered`);
-    return authentication(data);
   });
 }
 
@@ -123,11 +122,13 @@ app.post('/register', (req, res) => {
             console.log('Error: Admin already exists');
             res.json({}).status(300);
           } else {
-            res.json(userEntry(req.body)).status(200);
+            userEntry(req.body);
+            res.json(authentication(req.body)).status(200);
           }
         });
       } else {
-        res.json(userEntry(req.body)).status(200);
+        userEntry(req.body);
+        res.json(authentication(req.body)).status(200);
       }
     });
   } else {
