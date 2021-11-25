@@ -71,15 +71,7 @@ app.post('/register', (req, res) => {
   // TODO: If username exists respond with bad authentication
   // TODO: Register user with the group or create group if user is admin... there can only be one admin
   // let userchecksflag = 0;
-  const usersave = `
-    insert into users( username, passwrd, usertype)
-    values (
-      '${req.body.username}',
-      '${req.body.password}',
-      '${req.body.userType}')`;
-  const usercheck = 'select username from users';
-  const admincheck = 'select usertype from users';
-  dbConnection.query(usercheck, (err, result) => {
+  dbConnection.query('select username from users', (err, result) => {
     if (err) {
       console.error(`Failed to check usernames: ${err.stack}\n`);
     }
@@ -92,7 +84,7 @@ app.post('/register', (req, res) => {
   });
 
   if (req.body.userType === 'admin') {
-    dbConnection.query(admincheck, (err, result) => {
+    dbConnection.query('select usertype from users', (err, result) => {
       if (err) {
         console.error(`Failed to check admin: ${err.stack}\n`);
       }
@@ -105,6 +97,12 @@ app.post('/register', (req, res) => {
     });
   }
 
+  const usersave = `
+    insert into users( username, passwrd, usertype)
+    values (
+      '${req.body.username}',
+      '${req.body.password}',
+      '${req.body.userType}')`;
   dbConnection.query(usersave, (err) => {
     if (err) {
       console.error(`Failed to write to DB: ${err.stack}\n`);
