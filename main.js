@@ -2,7 +2,6 @@ require('dotenv').config({ path: '.env' });
 const express = require('express');
 const socketio = require('socket.io');
 const mysql = require('mysql');
-// const os = require('os');
 const http = require('http');
 const cors = require('cors');
 // const fs = require('fs');
@@ -37,38 +36,7 @@ function writeToFile(data) {
     console.log('Data written: %s', data);
   });
 }
-
- function readFromFile() {
-  fs.readFile('demo.txt', 'utf8', (error, data) => {
-    console.log('Read complete');
-    console.log(error);
-    console.log(data);
-    return data;
-  });
-}
-
-function adminFileCheck(sstring) {
-  let found = false;
-  fs.readFile('demo.txt', 'utf8', (error, data) => {
-    if (data.startsWith(sstring)) {
-      found = true;
-    }
-    return found;
-  });
-}
-
-function scanFileFor(sstring) {
-  let found = false;
-  console.log(sstring);
-  fs.readFile('demo.txt', 'utf8', (error, data) => {
-    if (data.includes(sstring + os.EOL)) {
-      found = true;
-    }
-    return found;
-  });
-}
 */
-
 function authentication(data) {
   // TODO: replace stub with actual auth system
   console.log(`creating authentication using user data form ${data.username}`);
@@ -104,12 +72,11 @@ app.post('/register', (req, res) => {
   // TODO: Register user with the group or create group if user is admin... there can only be one admin
   // let userchecksflag = 0;
   const usersave = `
-  insert into users( username, passwrd, usertype)
-  values (
-    '${req.body.username}',
-    '${req.body.password}',
-    '${req.body.userType}'
-  )`;
+    insert into users( username, passwrd, usertype)
+    values (
+      '${req.body.username}',
+      '${req.body.password}',
+      '${req.body.userType}')`;
   const usercheck = 'select username from users';
   const admincheck = 'select usertype from users';
   dbConnection.query(usercheck, (err, result) => {
