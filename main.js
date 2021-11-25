@@ -49,17 +49,42 @@ function authentication(data) {
 }
 
 app.get('/login', (req, res) => {
-  // Check that user data was sent
+  // TODO: Hack change nested queries to promises
   console.log(req.query);
-  if (req.body.username && req.body.password) {
-    // TODO: Check that there is a username and password in query object and query object exits
-    // TODO: Check file system for check group has user
-    // TODO: Check file system for user with those username and password combo
-    console.log(`user, ${req.query.username} logged in`);
-    res.json(authentication(req.query)).status(200);
+  if (req.query.username && req.query.password) {
+    dbConnection.query('select username from users', (err, result) => {
+      if (err) {
+        console.error(`Failed to check usernames: ${err.stack}\n`);
+      }
+      if (JSON.stringify(result).includes(`"username":"${req.query.username}"`)) {
+        console.log(`Username ${req.query.username} found`);
+        dbConnection.query(`select passwrd from users where username = '${req.query.username}'`, (err2, result2) => {
+          if (err2) {
+            console.error(`Failed to check password: ${err.stack}\n`);
+          }
+          if (JSON.stringify(result2).includes(`"passwrd":"${req.query.password}"`)) {
+            console.log('User Confirmed');
+            dbConnection.query(`select usertype from users where username = '${req.query.username}'`, (err3, result3) => {
+              if (err3) {
+                console.error(`Failed to append user type: ${err.stack}\n`);
+              }
+              const throwObject = Object.assign(req.query, result3);
+              console.log(throwObject);
+              res.json(authentication(throwObject)).status(300);
+            });
+          } else {
+            console.log('Bad Password');
+            res.json({}).status(300);
+          }
+        });
+      } else {
+        console.log('Login Error');
+        res.json({}).status(300);
+      }
+    });
   } else {
     console.log('Error: Credentials not recieved from client');
-    res.json(authentication(req.query)).status(300); // TODO: should respond with isAuth as false and null for token
+    res.json({}).status(300); // TODO: should respond with isAuth as false and null for token
   }
 });
 
