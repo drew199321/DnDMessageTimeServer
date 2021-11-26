@@ -28,15 +28,7 @@ dbConnection.connect((err) => {
   }
   console.log('Connected to database.');
 });
-/*
-function writeToFile(data) {
-  fs.appendFile('demo.txt', data + os.EOL, 'utf8', (error) => {
-    console.log('Write complete');
-    console.log('Error: %s', error);
-    console.log('Data written: %s', data);
-  });
-}
-*/
+
 function authentication(data) {
   // TODO: replace stub with actual auth system
   console.log(`creating authentication using user data form ${data.username}`);
@@ -45,7 +37,7 @@ function authentication(data) {
     token: 'tokenData',
     userType: data.userType,
     username: data.username,
-  }; // TODO: If admin send that back
+  };
 }
 
 app.get('/login', (req, res) => {
