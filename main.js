@@ -60,9 +60,8 @@ app.get('/login', (req, res) => {
               if (err3) {
                 console.error(`Failed to append user type: ${err.stack}\n`);
               }
-              const throwObject = Object.assign(req.query, result3);
-              console.log(throwObject);
-              res.json(authentication(throwObject)).status(300);
+              req.query = Object.assign(req.query, result3);
+              res.json(authentication(req.query)).status(300);
             });
           } else {
             console.log('Bad Password');
@@ -125,7 +124,7 @@ app.post('/register', (req, res) => {
     });
   } else {
     console.log('Error: Credentials not recieved from client');
-    res.json(authentication(req.query)).status(300);
+    res.json({}).status(200);
   }
 });
 
