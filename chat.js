@@ -1,47 +1,48 @@
 const uuidv4 = require('uuid').v4;
 
 const messages = new Set();
+const newMessages = new Set();
 const users = new Map();
 
-/*
+// TODO: This is temp should be replaced with call to db
 const savedMessages = [
   {
-    messageId: '1',
-    username: 'steve',
+    id: '1',
+    username: 'admin',
     messageType: 'brodcast',
-    message: 'words words words',
+    content: 'words words words',
     time: 'time',
   },
   {
-    messageId: '2',
-    username: 'bob',
+    id: '2',
+    username: 'member1',
     messageType: 'direct',
-    message: 'words words words',
+    content: 'member1',
     time: 'time',
   },
   {
-    messageId: '3',
-    username: 'kevin',
+    id: '3',
+    username: 'member1',
     messageType: 'direct',
-    message: 'words words words',
+    content: 'member1',
     time: 'time',
   },
   {
-    messageId: '4',
-    username: 'bob',
+    id: '4',
+    username: 'member2',
     messageType: 'direct',
-    message: 'words words words',
+    content: 'member2',
     time: 'time',
   },
   {
-    messageId: '5',
-    username: 'steve',
+    id: '5',
+    username: 'admin',
     messageType: 'brodcast',
-    message: 'words words words',
+    content: 'words words words',
     time: 'time',
   },
 ];
-*/
+savedMessages.forEach((message) => messages.add(message));
 
 class Connection {
   constructor(io, socket) {
@@ -61,7 +62,14 @@ class Connection {
   }
 
   getMessages() {
-    messages.forEach((message) => this.sendMessage(message));
+    messages.forEach((message) => {
+      const user = users.get(this.socket);
+      if (users.get(this.socket).userType === 'admin') {
+        this.sendMessage(message);
+      } else if (user.userType === 'member' && (message.messageType === 'brodcast' || message.username === user.username)) {
+        this.sendMessage(message);
+      }
+    });
   }
 
   handleMessage(data) {
@@ -74,11 +82,17 @@ class Connection {
     };
 
     messages.add(message);
+    newMessages.add(message);
     this.sendMessage(message);
   }
 
   disconnect() {
     users.delete(this.socket);
+    if (users.size === 0) {
+      console.log('Last user has dc uploading to db');
+      // TODO: Add all new messages to the db.
+      console.log(newMessages);
+    }
   }
 }
 

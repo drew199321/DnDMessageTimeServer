@@ -4,7 +4,6 @@ const socketio = require('socket.io');
 const mysql = require('mysql');
 const http = require('http');
 const cors = require('cors');
-// const fs = require('fs');
 const chat = require('./chat');
 
 const app = express();
@@ -31,7 +30,7 @@ dbConnection.connect((err) => {
 
 function authentication(data) {
   // TODO: replace stub with actual auth system
-  console.log(`creating authentication using user data form ${data.username}`);
+  console.log(`creating authentication using user data from ${data.username}`);
   return {
     isAuthenticated: true,
     token: 'tokenData',
@@ -47,21 +46,30 @@ app.get('/login', (req, res) => {
     dbConnection.query('select username from users', (err, result) => {
       if (err) {
         console.error(`Failed to check usernames: ${err.stack}\n`);
+        res.status(500);
+        return;
       }
       if (JSON.stringify(result).includes(`"username":"${req.query.username}"`)) {
         console.log(`Username ${req.query.username} found`);
         dbConnection.query(`select passwrd from users where username = '${req.query.username}'`, (err2, result2) => {
           if (err2) {
             console.error(`Failed to check password: ${err.stack}\n`);
+            res.status(500);
+            return;
           }
           if (JSON.stringify(result2).includes(`"passwrd":"${req.query.password}"`)) {
             console.log('User Confirmed');
             dbConnection.query(`select usertype from users where username = '${req.query.username}'`, (err3, result3) => {
               if (err3) {
-                console.error(`Failed to append user type: ${err.stack}\n`);
+                console.error(`Failed to find user type: ${err.stack}\n`);
+                res.status(500);
+                return;
               }
-              req.query = Object.assign(req.query, result3);
-              res.json(authentication(req.query)).status(300);
+              // TODO: This is unsafe should have more checks in case of failure on result3 and other userTypes... switch statment would be best with ENUMS
+              res.json(authentication(Object.assign(
+                req.query,
+                { userType: result3[0].usertype === 1 ? 'admin' : 'member' },
+              ))).status(300);
             });
           } else {
             console.log('Bad Password');
@@ -80,18 +88,20 @@ app.get('/login', (req, res) => {
 });
 
 function userEntry(data) {
-  dbConnection.query(`
-  insert into users( username, passwrd, usertype)
-  values (
-    '${data.username}',
-    '${data.password}',
-    '${data.userType}')`, (err) => {
-    if (err) {
-      console.error(`Failed to write to DB: ${err.stack}\n`);
-    }
-    console.log('User info recorded to database');
-    console.log(`user, ${data.username} registered`);
-  });
+  dbConnection.query(
+    `insert into users( username, passwrd, usertype) values (
+      '${data.username}',
+      '${data.password}',
+      '${data.userType === 'admin' ? 1 : 0}')`, // TODO: This should be done before the insert creation and be checked and be in a switch statment with ENUMS
+    (err) => {
+      if (err) {
+        console.error(`Failed to write to DB: ${err.stack}\n`);
+        return;
+      }
+      console.log('User info recorded to database');
+      console.log(`user, ${data.username} registered`);
+    },
+  );
 }
 
 app.post('/register', (req, res) => {
@@ -100,6 +110,8 @@ app.post('/register', (req, res) => {
     dbConnection.query('select username from users', (err, result) => {
       if (err) {
         console.error(`Failed to check usernames: ${err.stack}\n`);
+        res.status(500);
+        return;
       }
       if (JSON.stringify(result).includes(`"username":"${req.body.username}"`)) {
         console.log(`Error: Username ${req.body.username} already exists in database`);
@@ -108,6 +120,8 @@ app.post('/register', (req, res) => {
         dbConnection.query('select usertype from users', (err2, result2) => {
           if (err2) {
             console.error(`Failed to check admin: ${err.stack}\n`);
+            res.status(500);
+            return;
           }
           if (JSON.stringify(result2).includes('"usertype":0')) {
             console.log('Error: Admin already exists');
