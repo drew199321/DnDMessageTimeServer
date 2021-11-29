@@ -36,12 +36,12 @@ function authentication(data) {
     token: 'tokenData',
     userType: data.userType,
     username: data.username,
+    userid: data.userid,
   };
 }
 
 app.get('/login', (req, res) => {
   // TODO: Hack change nested queries to promises
-  console.log(req.query);
   if (req.query.username && req.query.password) {
     dbConnection.query('select username from users', (err, result) => {
       if (err) {
@@ -51,9 +51,9 @@ app.get('/login', (req, res) => {
       }
       if (JSON.stringify(result).includes(`"username":"${req.query.username}"`)) {
         console.log(`Username ${req.query.username} found`);
-        dbConnection.query(`select passwrd from users where username = '${req.query.username}'`, (err2, result2) => {
+        dbConnection.query('select passwrd, userid from users where username = ?', [req.query.username], (err2, result2) => {
           if (err2) {
-            console.error(`Failed to check password: ${err.stack}\n`);
+            console.error(`Failed to check password: ${err2.stack}\n`);
             res.status(500);
             return;
           }
@@ -61,13 +61,14 @@ app.get('/login', (req, res) => {
             console.log('User Confirmed');
             dbConnection.query(`select usertype from users where username = '${req.query.username}'`, (err3, result3) => {
               if (err3) {
-                console.error(`Failed to find user type: ${err.stack}\n`);
+                console.error(`Failed to find user type: ${err3.stack}\n`);
                 res.status(500);
                 return;
               }
               // TODO: This is unsafe should have more checks in case of failure on result3 and other userTypes... switch statment would be best with ENUMS
               res.json(authentication(Object.assign(
                 req.query,
+                { userid: result2[0].userid },
                 { userType: result3[0].usertype === 1 ? 'admin' : 'member' },
               ))).status(300);
             });

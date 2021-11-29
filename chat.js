@@ -1,48 +1,45 @@
 const uuidv4 = require('uuid').v4;
+const mysql = require('mysql');
 
 const messages = new Set();
 const newMessages = new Set();
 const users = new Map();
 
-// TODO: This is temp should be replaced with call to db
-const savedMessages = [
-  {
-    id: '1',
-    username: 'admin',
-    messageType: 'brodcast',
-    content: 'words words words',
-    time: 'time',
+const dbConnection = mysql.createConnection({
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  port: process.env.DB_PORT,
+  database: process.env.DB_DATABASE,
+});
+
+// TODO: May need to open and close the connection for each call
+dbConnection.connect((err) => {
+  if (err) {
+    console.error(`Database connection failed:\n ${err.stack}`);
+    return;
+  }
+  console.log('Connected to database.');
+});
+
+dbConnection.query(
+  `SELECT msgid, time_of, content, type, username FROM messages
+  JOIN users WHERE messages.userid = users.userid;`,
+  (err, savedMesges) => {
+    if (err) {
+      console.error(`Failed to find user type: ${err.stack}\n`);
+    }
+    savedMesges.forEach((message) => {
+      messages.add({
+        id: message.msgid,
+        username: message.username,
+        time: message.time_of,
+        content: message.content,
+        type: message.type,
+      });
+    });
   },
-  {
-    id: '2',
-    username: 'member1',
-    messageType: 'direct',
-    content: 'member1',
-    time: 'time',
-  },
-  {
-    id: '3',
-    username: 'member1',
-    messageType: 'direct',
-    content: 'member1',
-    time: 'time',
-  },
-  {
-    id: '4',
-    username: 'member2',
-    messageType: 'direct',
-    content: 'member2',
-    time: 'time',
-  },
-  {
-    id: '5',
-    username: 'admin',
-    messageType: 'brodcast',
-    content: 'words words words',
-    time: 'time',
-  },
-];
-savedMessages.forEach((message) => messages.add(message));
+);
 
 class Connection {
   constructor(io, socket) {
@@ -52,9 +49,7 @@ class Connection {
     socket.on('getMessages', () => this.getMessages());
     socket.on('message', (data) => this.handleMessage(data));
     socket.on('disconnect', () => this.disconnect());
-    socket.on('connect_error', (err) => {
-      console.log(`connect_error due to ${err.message}`);
-    });
+    socket.on('connect_error', (err) => console.log(`connect_error due to ${err.message}`));
   }
 
   sendMessage(message) {
@@ -66,7 +61,7 @@ class Connection {
       const user = users.get(this.socket);
       if (users.get(this.socket).userType === 'admin') {
         this.sendMessage(message);
-      } else if (user.userType === 'member' && (message.messageType === 'brodcast' || message.username === user.username)) {
+      } else if (user.userType === 'member' && (message.type === 'brodcast' || message.username === user.username)) {
         this.sendMessage(message);
       }
     });
@@ -75,9 +70,10 @@ class Connection {
   handleMessage(data) {
     const message = {
       id: uuidv4(),
+      userid: users.get(this.socket).userid,
       username: users.get(this.socket).username,
-      messageType: data.messageType,
-      value: data.value,
+      type: data.type,
+      content: data.value,
       time: Date.now(),
     };
 
@@ -90,17 +86,35 @@ class Connection {
     users.delete(this.socket);
     if (users.size === 0) {
       console.log('Last user has disconected... now uploading to db');
-      // TODO: Add all new messages to the db.
-      console.log(newMessages);
+      newMessages.forEach((message) => {
+        dbConnection.query(
+          'INSERT INTO messages VALUES (?, ?, ?, ?, ?)',
+          [message.id, message.userid, message.time, message.content, message.type],
+          (err) => {
+            if (err) {
+              console.error(`Failed to upload message: ${err.stack}\n`);
+            }
+          },
+        );
+      });
+      newMessages.clear();
     }
   }
 }
 
+// TODO: Should check authToken before connection
 async function authHandler(socket, next) {
-  const { username, userType, token = null } = socket.handshake.query || {};
+  const {
+    username,
+    userType,
+    userid,
+    token = null,
+  } = socket.handshake.query || {};
   if (token) {
     try {
+      console.log(users.size);
       users.set(socket, {
+        userid,
         userType,
         username,
       });

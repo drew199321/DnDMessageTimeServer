@@ -9,13 +9,15 @@ create table users(
 	userid int not null auto_increment primary key,
 	username varchar(255) not null,
 	passwrd varchar(255) not null,
-	usertype int
-) engine=innodb auto_increment=1 ;
+	usertype int not null
+) engine=innodb auto_increment=1;
 
 create table messages(
 	msgid varchar(255) not null primary key,
-	msgtime datetime not null,
-  msgcontent varchar(255),
-	userid int not null,
+  userid int not null,
+	time_of datetime not null,
+  content varchar(255) not null,
+  type varchar(225) not null,
 	foreign key (userid) references users(userid)
-) engine=innodb auto_increment=1 ;
+) engine=innodb auto_increment=1;
+
