@@ -13,7 +13,7 @@ const dbConnection = mysql.createConnection({
   database: process.env.DB_DATABASE,
 });
 
-// TODO: May need to open and close the connection for each call
+// TODO: May need to set up a pool
 dbConnection.connect((err) => {
   if (err) {
     console.error(`Database connection failed:\n ${err.stack}`);
@@ -89,7 +89,7 @@ class Connection {
       newMessages.forEach((message) => {
         dbConnection.query(
           'INSERT INTO messages VALUES (?, ?, ?, ?, ?)',
-          [message.id, message.userid, message.time, message.content, message.type],
+          [message.id, message.userid, message.time_of, message.content, message.type],
           (err) => {
             if (err) {
               console.error(`Failed to upload message: ${err.stack}\n`);
