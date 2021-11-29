@@ -89,7 +89,7 @@ class Connection {
       newMessages.forEach((message) => {
         dbConnection.query(
           'INSERT INTO messages VALUES (?, ?, ?, ?, ?)',
-          [message.id, message.userid, message.time_of, message.content, message.type],
+          [message.id, message.userid, new Date(message.time), message.content, message.type],
           (err) => {
             if (err) {
               console.error(`Failed to upload message: ${err.stack}\n`);
