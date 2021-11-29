@@ -53,16 +53,21 @@ class Connection {
   }
 
   sendMessage(message) {
-    this.io.sockets.emit('message', message);
+    const user = users.get(this.socket);
+    if (users.get(this.socket).userType === 'admin') {
+      this.io.sockets.emit('message', message);
+    } else if (user.userType === 'member' && (message.type === 'brodcast' || message.username === user.username)) {
+      this.io.sockets.emit('message', message);
+    }
   }
 
   getMessages() {
     messages.forEach((message) => {
       const user = users.get(this.socket);
       if (users.get(this.socket).userType === 'admin') {
-        this.sendMessage(message);
+        this.io.sockets.emit('message', message);
       } else if (user.userType === 'member' && (message.type === 'brodcast' || message.username === user.username)) {
-        this.sendMessage(message);
+        this.io.sockets.emit('message', message);
       }
     });
   }
