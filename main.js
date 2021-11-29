@@ -39,7 +39,7 @@ function authentication(data) {
     userid: data.userid,
   };
 }
-
+// TODO: combine queries into one 'SELECT * FROM users where userid = ? AND passwrd = ?', [value, value, value]
 app.get('/login', (req, res) => {
   // TODO: Hack change nested queries to promises
   if (req.query.username && req.query.password) {
