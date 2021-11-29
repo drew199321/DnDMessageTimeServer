@@ -88,23 +88,6 @@ app.get('/login', (req, res) => {
   }
 });
 
-function userEntry(data) {
-  dbConnection.query(
-    `insert into users( username, passwrd, usertype) values (
-      '${data.username}',
-      '${data.password}',
-      '${data.userType === 'admin' ? 1 : 0}')`, // TODO: This should be done before the insert creation and be checked and be in a switch statment with ENUMS
-    (err) => {
-      if (err) {
-        console.error(`Failed to write to DB: ${err.stack}\n`);
-        return;
-      }
-      console.log('User info recorded to database');
-      console.log(`user, ${data.username} registered`);
-    },
-  );
-}
-
 app.post('/register', (req, res) => {
   // TODO: Hack change nested queries to promises
   if (req.body.username && req.body.password && req.body.userType) {
@@ -128,13 +111,43 @@ app.post('/register', (req, res) => {
             console.log('Error: Admin already exists');
             res.json({}).status(300);
           } else {
-            userEntry(req.body);
-            res.json(authentication(req.body)).status(200);
+            dbConnection.query(
+              'insert into users values ( default, ?, ?, ? )',
+              [req.body.username, req.body.password, req.body.userType === 'admin' ? 1 : 0], // TODO: This ternary should be done with ENUMS
+              (err3, result3) => {
+                if (err3) {
+                  console.error(`Failed to write to DB: ${err3.stack}\n`);
+                  return;
+                }
+                console.log('User info recorded to database');
+                console.log(`user, ${req.body.username} registered`);
+                res.json(authentication(Object.assign(
+                  req.body,
+                  { userid: result3.insertId },
+                  { userType: 'admin' },
+                ))).status(200);
+              },
+            );
           }
         });
       } else {
-        userEntry(req.body);
-        res.json(authentication(req.body)).status(200);
+        dbConnection.query(
+          'insert into users values ( default, ?, ?, ? )',
+          [req.body.username, req.body.password, req.body.userType === 'admin' ? 1 : 0], // TODO: This ternary should be done with ENUMS
+          (err3, result3) => {
+            if (err3) {
+              console.error(`Failed to write to DB: ${err3.stack}\n`);
+              return;
+            }
+            console.log('User info recorded to database');
+            console.log(`user, ${req.body.username} registered`);
+            res.json(authentication(Object.assign(
+              req.body,
+              { userid: result3.insertId },
+              { userType: 'member' },
+            ))).status(200);
+          },
+        );
       }
     });
   } else {

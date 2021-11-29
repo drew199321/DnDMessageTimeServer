@@ -87,6 +87,7 @@ class Connection {
     if (users.size === 0) {
       console.log('Last user has disconected... now uploading to db');
       newMessages.forEach((message) => {
+        console.log(message);
         dbConnection.query(
           'INSERT INTO messages VALUES (?, ?, ?, ?, ?)',
           [message.id, message.userid, new Date(message.time), message.content, message.type],
