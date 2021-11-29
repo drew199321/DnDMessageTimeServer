@@ -62,8 +62,8 @@ class Connection {
   }
 
   getMessages() {
+    const user = users.get(this.socket);
     messages.forEach((message) => {
-      const user = users.get(this.socket);
       if (users.get(this.socket).userType === 'admin') {
         this.io.sockets.emit('message', message);
       } else if (user.userType === 'member' && (message.type === 'brodcast' || message.username === user.username)) {
