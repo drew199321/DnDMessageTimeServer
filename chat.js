@@ -89,7 +89,7 @@ class Connection {
   disconnect() {
     users.delete(this.socket);
     if (users.size === 0) {
-      console.log('Last user has dc uploading to db');
+      console.log('Last user has disconected... now uploading to db');
       // TODO: Add all new messages to the db.
       console.log(newMessages);
     }
