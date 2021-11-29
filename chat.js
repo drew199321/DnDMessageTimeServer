@@ -112,7 +112,6 @@ async function authHandler(socket, next) {
   } = socket.handshake.query || {};
   if (token) {
     try {
-      console.log(users.size);
       users.set(socket, {
         userid,
         userType,
