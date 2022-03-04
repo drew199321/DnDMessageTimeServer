@@ -19,7 +19,7 @@ dbConnection.connect((err) => {
     console.error(`Database connection failed:\n ${err.stack}`);
     return;
   }
-  console.log('Connected to database.');
+  console.log('chatroom Connected to database.');
 });
 
 dbConnection.query(
@@ -53,6 +53,7 @@ class Connection {
   }
 
   sendMessage(message) {
+    console.log(message);
     this.io.sockets.emit('message', message);
   }
 
@@ -128,7 +129,11 @@ function chat(io) {
   io.use(authHandler);
   io.on('connection', (socket) => {
     // eslint-disable-next-line no-new
+    console.log('Socket connection established');
     new Connection(io, socket);
+  });
+  io.on('connect_error', (err) => {
+    console.log(`connect_error due to ${err.message}`)
   });
 }
 
