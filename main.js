@@ -19,13 +19,15 @@ const dbConnection = mysql.createConnection({
   database: process.env.DB_DATABASE,
 });
 
+const router = express.Router();
+
 // TODO: May need to open and close the connection for each call
 dbConnection.connect((err) => {
   if (err) {
     console.error(`Database connection failed:\n ${err.stack}`);
     return;
   }
-  console.log('Connected to database.');
+  console.log('main Connected to database.');
 });
 
 function authentication(data) {
@@ -40,7 +42,7 @@ function authentication(data) {
   };
 }
 // TODO: combine queries into one 'SELECT * FROM users where userid = ? AND passwrd = ?', [value, value, value]
-app.get('/login', (req, res) => {
+router.get('/login', (req, res) => {
   // TODO: Hack change nested queries to promises
   if (req.query.username && req.query.password) {
     dbConnection.query('select username from users', (err, result) => {
@@ -88,8 +90,11 @@ app.get('/login', (req, res) => {
   }
 });
 
-app.post('/register', (req, res) => {
+router.post('/register', (req, res) => {
   // TODO: Hack change nested queries to promises
+  console.log(req.body);
+  console.log(req.body.password);
+  console.log(req.body.userType);
   if (req.body.username && req.body.password && req.body.userType) {
     dbConnection.query('select username from users', (err, result) => {
       if (err) {
@@ -156,14 +161,19 @@ app.post('/register', (req, res) => {
   }
 });
 
+app.use('/dnd-server', router);
+
 const io = socketio(server, {
   cors: {
     origin: '*',
     methods: ['GET', 'POST'],
   },
+  path: '/dnd-server/socket.io',
+  transports: ['websocket', 'polling'],
+  secure: true,
 });
 chat(io);
 
 server.listen(process.env.WEB_PORT, () => {
-  console.log(`Server is listning on port ${process.env.WEB_PORT}.`);
+  console.log(`Server is listening on port ${process.env.WEB_PORT}.`);
 });
