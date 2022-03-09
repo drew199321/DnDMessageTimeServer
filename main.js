@@ -161,7 +161,7 @@ router.post('/register', (req, res) => {
   }
 });
 
-app.use('/dnd-server', router);
+app.use('/dnd/dnd-server', router);
 
 const io = socketio(server, {
   cors: {
