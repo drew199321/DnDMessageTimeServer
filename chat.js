@@ -60,12 +60,14 @@ class Connection {
   getMessages() {
     const user = users.get(this.socket);
     messages.forEach((message) => {
+      printf(message);
       if (users.get(this.socket).userType === 'admin') {
         this.io.sockets.emit('message', message);
       } else if (user.userType === 'member' && (message.type === 'brodcast' || message.username === user.username)) {
         this.io.sockets.emit('message', message);
       }
     });
+
   }
 
   handleMessage(data) {
