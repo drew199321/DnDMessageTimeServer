@@ -5,7 +5,9 @@ const mysql = require('mysql');
 const http = require('http');
 const cors = require('cors');
 const chat = require('./chat');
-
+//*** added requires for scrambler and roller
+const roller = require('./roller'); // need ./?
+const scrambler = require('./scrambler');//  need ./? and possibly scramble
 const app = express();
 const server = http.createServer(app);
 app.use(express.json({ limit: '50mb' }));
@@ -173,7 +175,7 @@ const io = socketio(server, {
   secure: true,
 });
 chat(io);
-
+// do we need roller or scrambler here
 server.listen(process.env.WEB_PORT, () => {
   console.log(`Server is listening on port ${process.env.WEB_PORT}.`);
 });
