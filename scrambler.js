@@ -257,4 +257,5 @@ document.querySelector('#percent').addEventListener('input', e=>{
         if (value < min) { elmnt.value = elmnt.min; }
     }
 });
-module.exports scrambler; // possibly scramble
+
+module.exports = scrambler; // possibly scramble

@@ -150,4 +150,4 @@ document.querySelector('#dice').addEventListener('input', e=>{
         if (value === NaN) { elmnt.value = 0; }
     }
 });
-module.exports roller;
+module.exports = roller;
