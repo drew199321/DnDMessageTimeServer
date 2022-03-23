@@ -6,8 +6,8 @@ const http = require('http');
 const cors = require('cors');
 const chat = require('./chat');
 //*** added requires for scrambler and roller
-const roller = require('./roller'); // need ./?
-const scrambler = require('./scrambler');//  need ./? and possibly scramble
+const diceroll = require('./roller'); // need ./?
+const scramble = require('./scrambler');//  need ./? and possibly scramble
 const app = express();
 const server = http.createServer(app);
 app.use(express.json({ limit: '50mb' }));

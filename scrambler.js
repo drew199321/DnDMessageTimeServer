@@ -258,4 +258,4 @@ document.querySelector('#percent').addEventListener('input', e=>{
     }
 });
 
-module.exports = scrambler; // possibly scramble
+module.exports = scramble; // possibly scramble
