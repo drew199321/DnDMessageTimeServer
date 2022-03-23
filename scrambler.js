@@ -244,7 +244,7 @@ function updateSlider(percent) {
     if (percent === "") { percent = 0 }
     document.querySelector('#slide').value = percent;
 }
-
+/*
 document.querySelector('#percent').addEventListener('input', e=>{
     const elmnt = e.target || e
 
@@ -257,5 +257,6 @@ document.querySelector('#percent').addEventListener('input', e=>{
         if (value < min) { elmnt.value = elmnt.min; }
     }
 });
+*/
 
 module.exports = scramble; // possibly scramble
