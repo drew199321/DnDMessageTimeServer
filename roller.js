@@ -138,6 +138,7 @@ function diceroll()
 //has attempted to input a value outside of the established range and if
 //they have it sets it to the closest value inside the range
 
+/*
 document.querySelector('#dice').addEventListener('input', e=>{
     const elmnt = e.target || e
 
@@ -151,7 +152,6 @@ document.querySelector('#dice').addEventListener('input', e=>{
         if (value === NaN) { elmnt.value = 0; }
     }
 });
-
-
+*/
 
 module.exports = diceroll;
