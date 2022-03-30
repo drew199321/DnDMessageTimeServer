@@ -132,6 +132,7 @@ function chat(io) {
   io.on('connection', (socket) => {
     // eslint-disable-next-line no-new
     console.log('Socket connection established');
+    console.log(socket);
     new Connection(io, socket);
   });
   io.on('connect_error', (err) => {
