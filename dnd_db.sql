@@ -1,6 +1,7 @@
 use dnd;
-drop table if exists users;
 drop table if exists messages;
+drop table if exists users;
+
 
 set names utf8mb4;
 set character_set_client = utf8mb4;
