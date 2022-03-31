@@ -1,6 +1,6 @@
-drop database if exists dnd_db;
-create database dnd_db;
-use dnd_db;
+drop database if exists dnd;
+create database dnd;
+use dnd;
 
 set names utf8mb4;
 set character_set_client = utf8mb4;
