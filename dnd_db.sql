@@ -7,17 +7,17 @@ set character_set_client = utf8mb4;
 
 create table users(
 	userid int not null auto_increment primary key,
-	username varchar(100) not null,
-	passwrd varchar(100) not null,
+	username varchar(10) not null,
+	passwrd varchar(10) not null,
 	usertype int not null
 ) engine=innodb auto_increment=1;
 
 create table messages(
-	msgid varchar(100) not null primary key,
+	msgid varchar(25) not null primary key,
   userid int not null,
 	time_of datetime not null,
-  content varchar(100) not null,
-  type varchar(100) not null,
+  content varchar(25) not null,
+  type varchar(25) not null,
 	foreign key (userid) references users(userid)
 ) engine=innodb auto_increment=1;
 
