@@ -14,11 +14,11 @@ create table users(
 ) engine=innodb auto_increment=1;
 
 create table messages(
-	msgid varchar(100) not null primary key,
+	msgid varchar(120) not null primary key,
   userid int not null,
 	time_of datetime not null,
-  content varchar(100) not null,
-  type varchar(100) not null,
+  content varchar(120) not null,
+  type varchar(120) not null,
 	foreign key (userid) references users(userid)
 ) engine=innodb auto_increment=1;
 
