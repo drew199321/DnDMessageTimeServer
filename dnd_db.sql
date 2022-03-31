@@ -8,8 +8,8 @@ set character_set_client = utf8mb4;
 
 create table users(
 	userid int not null auto_increment primary key,
-	username varchar(10) not null,
-	passwrd varchar(10) not null,
+	username varchar(25) not null,
+	passwrd varchar(25) not null,
 	usertype int not null
 ) engine=innodb auto_increment=1;
 
