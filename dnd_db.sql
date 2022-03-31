@@ -1,14 +1,14 @@
-drop database if exists dnd;
-create database dnd;
 use dnd;
+drop table if exists users;
+drop table if exists messages;
 
 set names utf8mb4;
 set character_set_client = utf8mb4;
 
 create table users(
 	userid int not null auto_increment primary key,
-	username varchar(200) not null,
-	passwrd varchar(200) not null,
+	username varchar(100) not null,
+	passwrd varchar(100) not null,
 	usertype int not null
 ) engine=innodb auto_increment=1;
 
